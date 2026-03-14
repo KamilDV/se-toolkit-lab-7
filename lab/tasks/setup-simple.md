@@ -202,7 +202,7 @@ The database starts empty. You need to run the ETL pipeline to populate it with 
 
 3. Switch to the **Dashboard** tab.
 
-   You should see charts with analytics data (score distribution, submissions timeline, group performance, task pass rates).
+   You should see charts with analytics data (submissions timeline, score distribution, group performance, task pass rates).
 
 > [!IMPORTANT]
 > If the dashboard shows no data or errors, make sure:
