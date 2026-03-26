@@ -95,3 +95,59 @@ By the end of this lab, you should be able to say:
 ### Optional
 
 1. [Flutter Web Chatbot](./lab/tasks/optional/task-1.md)
+
+## Deploy
+
+### Prerequisites
+
+- Docker and Docker Compose installed on the VM
+- Qwen Code API proxy running on port 42005 (on the `lms-network`)
+- `.env.docker.secret` with all required variables (see below)
+
+### Required environment variables
+
+Copy `.env.docker.example` to `.env.docker.secret` and fill in:
+
+```text
+LMS_API_KEY=your-api-key
+AUTOCHECKER_API_LOGIN=your-email@innopolis.university
+AUTOCHECKER_API_PASSWORD=YourGitHubUsernameYourTelegramAlias
+BOT_TOKEN=your-telegram-bot-token
+LLM_API_KEY=your-qwen-api-key
+LLM_API_MODEL=coder-model
+```
+
+The bot connects to the backend via Docker network (`http://backend:8000`) and to the Qwen proxy via `http://qwen-code-api:8080/v1` — both resolved automatically inside Docker.
+
+### Start all services
+
+```terminal
+git clone https://github.com/KamilDV/se-toolkit-lab-7 ~/se-toolkit-lab-7
+cd ~/se-toolkit-lab-7
+cp .env.docker.example .env.docker.secret
+# edit .env.docker.secret with real values
+docker compose --env-file .env.docker.secret up --build -d
+```
+
+### Verify
+
+```terminal
+# Check all services are running
+docker compose --env-file .env.docker.secret ps
+
+# Check backend is healthy
+curl -sf http://localhost:42002/docs
+
+# Check bot logs
+docker compose --env-file .env.docker.secret logs bot --tail 20
+```
+
+### Populate the database
+
+After first deploy, run the ETL sync:
+
+```terminal
+curl -X POST http://localhost:42002/pipeline/sync \
+  -H "Authorization: Bearer YOUR_LMS_API_KEY" \
+  -H "Content-Type: application/json" -d '{}'
+```
