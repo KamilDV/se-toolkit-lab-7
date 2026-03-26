@@ -1,13 +1,18 @@
 import httpx
 import config
 from services.lms_client import get_health, get_labs, get_pass_rates
+from services.llm_client import route
 
 
 def handle_start() -> str:
     return (
         "👋 Welcome to LMS Bot!\n\n"
-        "I connect you to the LMS backend — check health, browse labs, and view scores.\n"
-        "Use /help to see all available commands."
+        "I connect you to the LMS backend — check health, browse labs, and view scores.\n\n"
+        "You can use slash commands or just ask me anything in plain language:\n"
+        "• \"which lab has the lowest pass rate?\"\n"
+        "• \"show me top 5 students in lab 4\"\n"
+        "• \"how many students are enrolled?\"\n\n"
+        "Use /help to see all slash commands."
     )
 
 
@@ -18,7 +23,8 @@ def handle_help() -> str:
         "/help — show this help\n"
         "/health — check backend status and item count\n"
         "/labs — list available labs\n"
-        "/scores <lab> — per-task pass rates (e.g. /scores lab-04)"
+        "/scores <lab> — per-task pass rates (e.g. /scores lab-04)\n\n"
+        "Or just type a question in plain language and I'll figure it out!"
     )
 
 
@@ -64,3 +70,10 @@ def handle_scores(lab: str) -> str:
         return f"❌ Backend error: HTTP {e.response.status_code} {e.response.reason_phrase}"
     except Exception as e:
         return f"❌ Backend error: {e}"
+
+
+def handle_message(text: str) -> str:
+    try:
+        return route(text)
+    except Exception as e:
+        return f"❌ LLM error: {e}"
